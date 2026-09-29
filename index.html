@@ -41,13 +41,7 @@
     background-size: 52px 52px;
     background-position: center top;
   }
-  .bg-grid-interactive {
-    background-image: linear-gradient(rgba(66,75,54,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(66,75,54,.2) 1px, transparent 1px);
-    background-size: 52px 52px;
-    background-position: center top;
-    mask-image: radial-gradient(450px circle at var(--mouse-x, 50%) var(--mouse-y, -100%), black, transparent);
-    -webkit-mask-image: radial-gradient(450px circle at var(--mouse-x, 50%) var(--mouse-y, -100%), black, transparent);
-  }
+
   .glow-orb {
     background: radial-gradient(circle, rgba(204,238,160,0.6) 0%, rgba(204,238,160,0) 70%);
   }
@@ -58,7 +52,7 @@
 
 <!-- Grid Backgrounds -->
 <div class="fixed inset-0 bg-grid-pattern z-0 pointer-events-none"></div>
-<div class="fixed inset-0 bg-grid-interactive z-0 pointer-events-none transition-opacity duration-500 opacity-0" id="interactive-grid"></div>
+
 
 <!-- Subtle Glow -->
 <div class="fixed inset-0 flex items-center justify-center z-0 pointer-events-none">
@@ -137,12 +131,12 @@
       </div>
     </div>
     
-    <div class="lg:col-span-5 flex justify-end perspective-[1000px] relative z-20" id="magnet-area">
+    <div class="lg:col-span-5 flex justify-end relative z-20">
       
-      <div id="magnet-card" class="group w-full max-w-[480px] bg-white/70 backdrop-blur-2xl border border-brand-sage shadow-2xl shadow-brand-olive/10 rounded-[32px] p-8 sm:p-10 relative z-10" style="transform-style: preserve-3d; will-change: transform;">
+      <div class="w-full max-w-[480px] bg-white/70 backdrop-blur-2xl border border-brand-sage shadow-2xl shadow-brand-olive/10 rounded-[32px] p-8 sm:p-10 relative z-10">
         
         <!-- Small Sticky Note -->
-        <div class="absolute -top-10 -left-4 lg:-left-12 z-30 animate-float pointer-events-none sm:pointer-events-auto transform-style-3d translate-z-[50px]" style="animation-delay: -2s;">
+        <div class="absolute -top-10 -left-4 lg:-left-12 z-30 animate-float pointer-events-none sm:pointer-events-auto" style="animation-delay: -2s;">
           <div class="w-32 bg-[#FDF7CA] border border-[#EBE2A5] rounded-xl shadow-xl shadow-[#D6CE91]/30 p-4 transform rotate-[-4deg] hover:rotate-0 hover:scale-105 transition-all duration-500 space-y-2.5 text-[9px] font-mono text-brand-deep font-semibold">
             <div class="flex items-center gap-2 px-2 py-1 -mx-2 rounded hover:bg-[#EBE2A5]/50 cursor-pointer transition-all duration-300 hover:translate-x-1"><span class="text-brand-olive font-bold">+</span> Learn</div>
             <div class="flex items-center gap-2 pl-6 py-1 -mx-2 rounded hover:bg-[#EBE2A5]/50 cursor-pointer transition-colors text-brand-mid font-medium">Build</div>
@@ -150,11 +144,7 @@
             <div class="flex items-center gap-2 px-2 py-1 -mx-2 rounded hover:bg-[#EBE2A5]/50 cursor-pointer transition-all duration-300 hover:translate-x-1"><span class="text-brand-olive font-bold">+</span> Grow</div>
           </div>
         </div>
-        <!-- Glass Gloss Sweep -->
-        <div class="absolute inset-0 rounded-[32px] overflow-hidden pointer-events-none z-0">
-          <div class="absolute top-0 bottom-0 left-0 w-32 -translate-x-[150px] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/80 to-transparent group-hover:translate-x-[500px] transition-transform duration-[1200ms] ease-in-out"></div>
-        </div>
-        <div class="flex flex-col items-center text-center transform-style-3d translate-z-[30px]">
+        <div class="flex flex-col items-center text-center">
           <div class="w-12 h-12 rounded-[14px] bg-brand-sagelt text-brand-deep mb-5 flex items-center justify-center shadow-inner border border-brand-green/10">
             <i class="w-5 h-5 stroke-[2]" data-lucide="lock"></i>
           </div>
@@ -162,7 +152,7 @@
           <p class="text-[13px] text-brand-mid mt-1.5 leading-relaxed">Enter your access code to continue.</p>
         </div>
         
-        <form id="portal-login-form" class="mt-8 space-y-5 transform-style-3d translate-z-[40px]">
+        <form id="portal-login-form" class="mt-8 space-y-5">
           <div class="space-y-1.5">
             <label class="block text-[10px] font-mono tracking-widest font-bold text-brand-mid uppercase" for="password">ACCESS CODE</label>
             <div class="relative">
@@ -184,77 +174,7 @@
 <script>
   lucide.createIcons();
   
-  // Grid Interaction & Magnetic Hover
   document.addEventListener('DOMContentLoaded', () => {
-    const interactiveGrid = document.getElementById('interactive-grid');
-    
-    document.addEventListener('mousemove', (e) => {
-      if (interactiveGrid) {
-        interactiveGrid.style.opacity = '1';
-        interactiveGrid.style.setProperty('--mouse-x', `${e.clientX}px`);
-        interactiveGrid.style.setProperty('--mouse-y', `${e.clientY}px`);
-      }
-    });
-
-    document.body.addEventListener('mouseleave', () => {
-      if (interactiveGrid) {
-        interactiveGrid.style.opacity = '0';
-      }
-    });
-
-    const area = document.getElementById('magnet-area');
-    const card = document.getElementById('magnet-card');
-    
-    if (area && card) {
-      let isHovering = false;
-      let targetX = 0;
-      let targetY = 0;
-      let currentX = 0;
-      let currentY = 0;
-      let animationFrameId = null;
-
-      function lerp(start, end, factor) {
-        return start + (end - start) * factor;
-      }
-
-      function animate() {
-        currentX = lerp(currentX, targetX, 0.08);
-        currentY = lerp(currentY, targetY, 0.08);
-
-        card.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg) translateZ(0)`;
-
-        if (!isHovering && Math.abs(currentX) < 0.1 && Math.abs(currentY) < 0.1) {
-            card.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0)`;
-            animationFrameId = null;
-            return;
-        }
-
-        animationFrameId = requestAnimationFrame(animate);
-      }
-
-      area.addEventListener('mousemove', (e) => {
-        const rect = area.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        const mouseX = e.clientX - centerX;
-        const mouseY = e.clientY - centerY;
-        
-        targetX = (mouseX / (rect.width / 2)) * 10;
-        targetY = -(mouseY / (rect.height / 2)) * 10;
-      });
-
-      area.addEventListener('mouseenter', () => {
-        isHovering = true;
-        if (!animationFrameId) animate();
-      });
-
-      area.addEventListener('mouseleave', () => {
-        isHovering = false;
-        targetX = 0;
-        targetY = 0;
-      });
-    }
     // Login Animation
     const loginForm = document.getElementById('portal-login-form');
     const unlockBtn = document.getElementById('unlock-btn');
